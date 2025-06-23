@@ -1,18 +1,26 @@
-import mysql.connector
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
-def get_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="your_mysql_username",
-        password="your_mysql_password",
-        database="your_database_name"
-    )
+class conf:
+    db_user = "root"
+    db_password = "Siraulo76!"
+    db_host = "localhost"
+    db_name = "smart_buddy_api"
+    db_port = 3306
 
-def test_connection():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT 'MySQL connection successful!'")
-    result = cursor.fetchone()
-    cursor.close()
-    conn.close()
-    return result[0]
+SQLALCHEMY_DATABASE_URL = (
+    f"mysql+pymysql://{conf.db_user}:{conf.db_password}@{conf.db_host}:{conf.db_port}/{conf.db_name}"
+)
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# Dependency for routes to get DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from smart_buddy.routers import index
 from smart_buddy import db
+from smart_buddy.routers import ratings
 
 app = FastAPI()
 
 app.include_router(index.router)
+app.include_router(ratings.router)
 
 @app.get("/")
 def read_root():
