@@ -4,11 +4,14 @@ from fastapi import FastAPI, Request
 from fastapi.templating import Jinja2Templates
 from smart_buddy.routers import user_profile
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
 app.include_router(index.router)
 app.include_router(user_profile.router)
+
+app.mount("/static", StaticFiles(directory="smart_buddy/static"), name="static")
 
 templates = Jinja2Templates(directory="smart_buddy/templates")
 @app.get("/")
