@@ -1,13 +1,16 @@
-from fastapi import FastAPI
 from smart_buddy.routers import index
 from smart_buddy import db
-from smart_buddy.routers import ratings
+from fastapi import FastAPI, Request
+from fastapi.templating import Jinja2Templates
+from smart_buddy.routers import user_profile
+from fastapi.responses import HTMLResponse
 
 app = FastAPI()
 
 app.include_router(index.router)
-app.include_router(ratings.router)
+app.include_router(user_profile.router)
 
+templates = Jinja2Templates(directory="smart_buddy/templates")
 @app.get("/")
 def read_root():
     return {"message": "SMART BUDDY environment setup successful!"}
@@ -24,3 +27,8 @@ def test_mysql():
 
 def get_user_name():
     return "Adam Pang"
+
+@app.get("/create-profile", response_class=HTMLResponse)
+async def show_create_profile(request: Request):
+    return templates.TemplateResponse("create_profile.html", {"request": request, "profile": {}})
+

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Create Profile</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 2rem; }
+    input, textarea, button { display: block; width: 100%; margin: 10px 0; padding: 10px; }
+    .checkbox-group { display: flex; gap: 1rem; margin-bottom: 1rem; }
+    label { display: flex; align-items: center; gap: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Create Profile</h1>
+  <form id="profile-form">
+    <input type="text" placeholder="Name" name="name" required />
+    <input type="email" placeholder="Email" name="email" required />
+    <input type="text" placeholder="Major" name="major" />
+    <textarea placeholder="Bio" name="bio"></textarea>
+
+    <h3>Personality Traits</h3>
+    <div class="checkbox-group">
+      <label><input type="checkbox" name="traits" value="Introvert" /> Introvert</label>
+      <label><input type="checkbox" name="traits" value="Extrovert" /> Extrovert</label>
+      <label><input type="checkbox" name="traits" value="Ambivert" /> Ambivert</label>
+    </div>
+
+    <h3>Study Style</h3>
+    <div class="checkbox-group">
+      <label><input type="radio" name="study_style" value="Group" /> Group</label>
+      <label><input type="radio" name="study_style" value="Solo" /> Solo</label>
+    </div>
+
+    <h3>Preferred Environment</h3>
+    <div class="checkbox-group">
+      <label><input type="radio" name="preferred_environment" value="Quiet" /> Quiet</label>
+      <label><input type="radio" name="preferred_environment" value="Active" /> Active</label>
+    </div>
+
+    <input type="text" name="study_subjects" placeholder="Study Subjects (comma-separated)" />
+    <input type="text" name="availability" placeholder="Weekly Availability" />
+    <textarea name="goals" placeholder="Study Goals"></textarea>
+
+    <button type="submit">Save</button>
+  </form>
+
+  <script>
+    const form = document.getElementById("profile-form");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      const profile = {
+        name: formData.get("name"),
+        email: formData.get("email"),
+        major: formData.get("major"),
+        bio: formData.get("bio"),
+        personality_traits: [...formData.getAll("traits")].join(","),
+        study_style: formData.get("study_style"),
+        preferred_environment: formData.get("preferred_environment"),
+        study_subjects: formData.get("study_subjects"),
+        availability: formData.get("availability"),
+        goals: formData.get("goals")
+      };
+
+      const response = await fetch("http://127.0.0.1:8000/profiles/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profile)
+      });
+
+      const data = await response.json();
+      alert(data.message || "Profile created!");
+    });
+  </script>
+</body>
+</html>
+<html>
+<head>
+    <title>Profile Saved</title>
+</head>
+<body>
+    <h1>Profile Saved Successfully!</h1>
+    <p>Name: {{ profile.name }}</p>
+    <p>Email: {{ profile.email }}</p>
+    <p>Personality: {{ profile.personality_type }}</p>
+    <p>Study Style: {{ profile.study_style }}</p>
+    <p>Environment: {{ profile.environment }}</p>
+    <p>Focus Area: {{ profile.focus_area }}</p>
+    <a href="/create-profile">Create Another</a>
+</body>
+</html>
