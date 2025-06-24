@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from smart_buddy.db import get_db
 from smart_buddy.models.base import UserProfile
 from fastapi.templating import Jinja2Templates
+from fastapi import HTTPException
 
 router = APIRouter(prefix="/profiles", tags=["Profiles"])
 
