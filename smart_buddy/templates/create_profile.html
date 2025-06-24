@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      background-color: #f4f6f9;
+      background-color: #eef2f7;
       margin: 0;
       padding: 0;
       display: flex;
@@ -19,42 +19,42 @@
 
     .container {
       background-color: #fff;
-      border-radius: 12px;
-      padding: 2rem;
-      margin-top: 2rem;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      max-width: 700px;
-      width: 100%;
+      border-radius: 16px;
+      padding: 3rem;
+      margin-top: 3rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      max-width: 900px;
+      width: 90%;
     }
 
     header {
       text-align: center;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
     }
 
     header img {
       width: 100px;
-      margin-bottom: 0.5rem;
+      margin-bottom: 1rem;
     }
 
     h1 {
-      color: #333;
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
+      font-size: 2.2rem;
+      color: #4c51bf;
+      margin: 0;
     }
 
     input, textarea, button, select {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
+      padding: 12px;
+      margin-top: 12px;
       border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1rem;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      font-family: 'Inter', sans-serif;
     }
 
     textarea {
       resize: vertical;
-      height: 100px;
     }
 
     button {
@@ -62,11 +62,19 @@
       color: white;
       border: none;
       cursor: pointer;
-      margin-top: 1rem;
+      margin-top: 1.5rem;
+      font-size: 1.05rem;
+      transition: background-color 0.2s ease;
     }
 
     button:hover {
       background-color: #434190;
+    }
+
+    h3 {
+      margin-top: 2rem;
+      font-size: 1.25rem;
+      color: #2d3748;
     }
 
     .checkbox-group, .radio-group {
@@ -83,10 +91,35 @@
       font-size: 0.95rem;
     }
 
-    h3 {
+    .availability-grid {
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+
+    .availability-grid table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.95rem;
+    }
+
+    .availability-grid th,
+    .availability-grid td {
+      padding: 8px;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+
+    .availability-grid th {
+      background-color: #edf2f7;
+      font-weight: 600;
+    }
+
+    .confirmation {
+      text-align: center;
+      color: green;
+      font-weight: 600;
       margin-top: 1.5rem;
-      font-size: 1.1rem;
-      color: #444;
+      display: none;
     }
   </style>
 </head>
@@ -110,6 +143,18 @@
         <label><input type="checkbox" name="traits" value="Ambivert"> Ambivert</label>
       </div>
 
+      <h3>Personality Test</h3>
+      <label>Openness to Experience</label>
+      <input type="range" name="openness" min="1" max="5" value="3">
+      <label>Conscientiousness</label>
+      <input type="range" name="conscientiousness" min="1" max="5" value="3">
+      <label>Extraversion</label>
+      <input type="range" name="extraversion" min="1" max="5" value="3">
+      <label>Agreeableness</label>
+      <input type="range" name="agreeableness" min="1" max="5" value="3">
+      <label>Neuroticism</label>
+      <input type="range" name="neuroticism" min="1" max="5" value="3">
+
       <h3>Study Style</h3>
       <div class="radio-group">
         <label><input type="radio" name="study_style" value="Group"> Group</label>
@@ -123,15 +168,67 @@
       </div>
 
       <input type="text" name="study_subjects" placeholder="Study Subjects (comma-separated)" />
-      <input type="text" name="availability" placeholder="Weekly Availability" />
+
+      <h3>Weekly Availability</h3>
+      <div class="availability-grid">
+        <table>
+          <thead>
+            <tr>
+              <th>Time / Day</th>
+              <th>Mon</th>
+              <th>Tue</th>
+              <th>Wed</th>
+              <th>Thu</th>
+              <th>Fri</th>
+              <th>Sat</th>
+              <th>Sun</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Morning</td>
+              <td><input type="checkbox" name="availability" value="Mon-Morning"></td>
+              <td><input type="checkbox" name="availability" value="Tue-Morning"></td>
+              <td><input type="checkbox" name="availability" value="Wed-Morning"></td>
+              <td><input type="checkbox" name="availability" value="Thu-Morning"></td>
+              <td><input type="checkbox" name="availability" value="Fri-Morning"></td>
+              <td><input type="checkbox" name="availability" value="Sat-Morning"></td>
+              <td><input type="checkbox" name="availability" value="Sun-Morning"></td>
+            </tr>
+            <tr>
+              <td>Afternoon</td>
+              <td><input type="checkbox" name="availability" value="Mon-Afternoon"></td>
+              <td><input type="checkbox" name="availability" value="Tue-Afternoon"></td>
+              <td><input type="checkbox" name="availability" value="Wed-Afternoon"></td>
+              <td><input type="checkbox" name="availability" value="Thu-Afternoon"></td>
+              <td><input type="checkbox" name="availability" value="Fri-Afternoon"></td>
+              <td><input type="checkbox" name="availability" value="Sat-Afternoon"></td>
+              <td><input type="checkbox" name="availability" value="Sun-Afternoon"></td>
+            </tr>
+            <tr>
+              <td>Evening</td>
+              <td><input type="checkbox" name="availability" value="Mon-Evening"></td>
+              <td><input type="checkbox" name="availability" value="Tue-Evening"></td>
+              <td><input type="checkbox" name="availability" value="Wed-Evening"></td>
+              <td><input type="checkbox" name="availability" value="Thu-Evening"></td>
+              <td><input type="checkbox" name="availability" value="Fri-Evening"></td>
+              <td><input type="checkbox" name="availability" value="Sat-Evening"></td>
+              <td><input type="checkbox" name="availability" value="Sun-Evening"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
       <textarea name="goals" placeholder="Study Goals"></textarea>
 
       <button type="submit">Save</button>
+      <div class="confirmation" id="confirmation-msg">Your response has been submitted.</div>
     </form>
   </div>
 
   <script>
     const form = document.getElementById("profile-form");
+    const confirmationMsg = document.getElementById("confirmation-msg");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -143,10 +240,15 @@
         major: formData.get("major"),
         bio: formData.get("bio"),
         personality_traits: [...formData.getAll("traits")].join(","),
+        openness: formData.get("openness"),
+        conscientiousness: formData.get("conscientiousness"),
+        extraversion: formData.get("extraversion"),
+        agreeableness: formData.get("agreeableness"),
+        neuroticism: formData.get("neuroticism"),
         study_style: formData.get("study_style"),
         preferred_environment: formData.get("preferred_environment"),
         study_subjects: formData.get("study_subjects"),
-        availability: formData.get("availability"),
+        availability: [...formData.getAll("availability")].join(","),
         goals: formData.get("goals")
       };
 
@@ -156,8 +258,12 @@
         body: JSON.stringify(profile)
       });
 
-      const data = await response.json();
-      alert(data.message || "Profile created!");
+      if (response.ok) {
+        confirmationMsg.style.display = "block";
+        form.reset();
+      } else {
+        alert("There was an error submitting your profile.");
+      }
     });
   </script>
 </body>
