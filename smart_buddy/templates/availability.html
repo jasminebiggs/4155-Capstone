@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Availability - Study Buddy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            margin-right: 16px;
+            padding: 8px;
+            border-radius: 8px;
+        }
+
+        .back-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        select, input[type="date"], input[type="time"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: white;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .time-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .save-btn {
+            width: 100%;
+            background-color: #4a5568;
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 16px;
+        }
+
+        .save-btn:hover {
+            background-color: #2d3748;
+        }
+
+        .save-btn:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .success {
+            color: #10b981;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .recurring-days {
+            display: none;
+            margin-top: 12px;
+        }
+
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .day-btn {
+            padding: 8px 4px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .day-btn.selected {
+            background-color: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .availability-list {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .availability-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h1>Enter Availability</h1>
+        </div>
+
+        <form id="availabilityForm">
+            <div class="form-group">
+                <label for="availabilityType">Availability Type:</label>
+                <select id="availabilityType" name="availability_type" required>
+                    <option value="">Select</option>
+                    <option value="one-time">One-time</option>
+                    <option value="recurring">Recurring Weekly</option>
+                    <option value="block">Time Block</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="dateGroup">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date">
+            </div>
+
+            <div class="recurring-days" id="recurringDays">
+                <label>Select Days:</label>
+                <div class="days-grid">
+                    <button type="button" class="day-btn" data-day="0">Mon</button>
+                    <button type="button" class="day-btn" data-day="1">Tue</button>
+                    <button type="button" class="day-btn" data-day="2">Wed</button>
+                    <button type="button" class="day-btn" data-day="3">Thu</button>
+                    <button type="button" class="day-btn" data-day="4">Fri</button>
+                    <button type="button" class="day-btn" data-day="5">Sat</button>
+                    <button type="button" class="day-btn" data-day="6">Sun</button>
+                </div>
+            </div>
+
+            <div class="time-row">
+                <div class="form-group">
+                    <label for="startTime">Start Time</label>
+                    <input type="time" id="startTime" name="start_time" required>
+                </div>
+                <div class="form-group">
+                    <label for="endTime">End Time</label>
+                    <input type="time" id="endTime" name="end_time" required>
+                </div>
+            </div>
+
+            <div id="errorMsg" class="error"></div>
+            <div id="successMsg" class="success"></div>
+
+            <button type="submit" class="save-btn" id="saveBtn">Save</button>
+        </form>
+
+        <div class="availability-list" id="availabilityList">
+            <h3>Your Availability</h3>
+            <div id="availabilityItems"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('availabilityForm');
+        const availabilityType = document.getElementById('availabilityType');
+        const dateGroup = document.getElementById('dateGroup');
+        const recurringDays = document.getElementById('recurringDays');
+        const dayBtns = document.querySelectorAll('.day-btn');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+        
+        let selectedDays = [];
+        const userId = 1; // Replace with actual user ID from session
+
+        // Set today's date as default
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Handle availability type change
+        availabilityType.addEventListener('change', function() {
+            const type = this.value;
+            
+            if (type === 'recurring') {
+                dateGroup.style.display = 'none';
+                recurringDays.style.display = 'block';
+            } else {
+                dateGroup.style.display = 'block';
+                recurringDays.style.display = 'none';
+            }
+        });
+
+        // Handle day selection for recurring
+        dayBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const day = parseInt(this.dataset.day);
+                
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    selectedDays = selectedDays.filter(d => d !== day);
+                } else {
+                    this.classList.add('selected');
+                    selectedDays.push(day);
+                }
+            });
+        });
+
+        // Form submission
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const type = formData.get('availability_type');
+            
+            clearMessages();
+            
+            try {
+                if (type === 'recurring') {
+                    await handleRecurringSubmission(formData);
+                } else {
+                    await handleSingleSubmission(formData);
+                }
+                
+                showSuccess('Availability saved successfully!');
+                form.reset();
+                selectedDays = [];
+                dayBtns.forEach(btn => btn.classList.remove('selected'));
+                loadAvailability();
+                
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+
+        async function handleSingleSubmission(formData) {
+            const data = {
+                availability_type: formData.get('availability_type'),
+                date: formData.get('date'),
+                start_time: formData.get('start_time'),
+                end_time: formData.get('end_time')
+            };
+
+            const response = await fetch(`/availability/?user_id=${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail);
+            }
+        }
+
+        async function handleRecurringSubmission(formData) {
+            if (selectedDays.length === 0) {
+                throw new Error('Please select at least one day');
+            }
+
+            const slots = selectedDays.map(day => ({
+                availability_type: 'recurring',
+                day_of_week: day,
+                start_time: formData.get('start_time'),
+                end_time: formData.get('end_time')
+            }));
+
+            const response = await fetch(`/availability/bulk?user_id=${userId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ slots })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.detail);
+            }
+        }
+
+        async function loadAvailability() {
+            try {
+                const response = await fetch(`/availability/user/${userId}`);
+                const availability = await response.json();
+                
+                const container = document.getElementById('availabilityItems');
+                container.innerHTML = '';
+                
+                availability.forEach(slot => {
+                    const item = createAvailabilityItem(slot);
+                    container.appendChild(item);
+                });
+                
+            } catch (error) {
+                console.error('Error loading availability:', error);
+            }
+        }
+
+        function createAvailabilityItem(slot) {
+            const div = document.createElement('div');
+            div.className = 'availability-item';
+            
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            let timeText = '';
+            
+            if (slot.availability_type === 'recurring') {
+                timeText = `${dayNames[slot.day_of_week]} ${slot.start_time} - ${slot.end_time}`;
+            } else {
+                timeText = `${slot.date} ${slot.start_time} - ${slot.end_time}`;
+            }
+            
+            div.innerHTML = `
+                <span>${timeText}</span>
+                <button class="delete-btn" onclick="deleteAvailability(${slot.id})">Delete</button>
+            `;
+            
+            return div;
+        }
+
+        async function deleteAvailability(id) {
+            try {
+                const response = await fetch(`/availability/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadAvailability();
+                    showSuccess('Availability deleted');
+                }
+            } catch (error) {
+                showError('Error deleting availability');
+            }
+        }
+
+        function showError(message) {
+            errorMsg.textContent = message;
+            successMsg.textContent = '';
+        }
+
+        function showSuccess(message) {
+            successMsg.textContent = message;
+            errorMsg.textContent = '';
+        }
+
+        function clearMessages() {
+            errorMsg.textContent = '';
+            successMsg.textContent = '';
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Load existing availability on page load
+        loadAvailability();
+    </script>
+</body>
+</html>
