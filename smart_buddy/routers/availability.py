@@ -1,5 +1,6 @@
 # smart_buddy/routers/availability.py
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from typing import List
 from smart_buddy.db import get_db
@@ -7,6 +8,12 @@ from smart_buddy.models.availability import Availability
 from smart_buddy.schemas.availability import AvailabilityCreate, AvailabilityResponse
 
 router = APIRouter(prefix="/availability", tags=["Availability"])
+templates = Jinja2Templates(directory="smart_buddy/templates")
+
+@router.get("/")
+async def availability_page(request: Request):
+    """Display the availability calendar interface"""
+    return templates.TemplateResponse("availability.html", {"request": request})
 
 @router.post("/")
 def create_availability(
