@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Your Study Profile</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        header {
+            background-color: #046A38;
+            padding: 1rem;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .availability-section {
+            margin-top: 20px;
+        }
+        .availability-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .availability-group {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .availability-group label {
+            display: block;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <nav>
+        <a href="/home">Home</a>
+        <a href="/login">Login</a>
+        <a href="/profile">Create Profile</a>
+        <a href="/schedule">Calendar/Schedule</a>
+        <a href="/matched-users">Matched Users</a>
+        <a href="/ratings">Ratings</a>
+    </nav>
+</header>
+
+<h1>Create Your Study Profile</h1>
+<form action="/profile" method="post">
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+
+    <label for="study_style">Study Style:</label>
+    <select id="study_style" name="study_style" required>
+        <option value="Group">Group</option>
+        <option value="Solo">Solo</option>
+    </select>
+
+    <label for="preferred_environment">Preferred Environment:</label>
+    <select id="preferred_environment" name="preferred_environment" required>
+        <option value="Quiet">Quiet</option>
+        <option value="Active">Active</option>
+    </select>
+
+    <label for="personality_traits">Personality Traits:</label>
+    <select id="personality_traits" name="personality_traits" required>
+        <option value="Introvert">Introvert</option>
+        <option value="Extrovert">Extrovert</option>
+    </select>
+
+    <label for="academic_focus_areas">Academic Focus Areas (list subjects, separated by commas):</label>
+    <textarea id="academic_focus_areas" name="academic_focus_areas"></textarea>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+
+    <div class="availability-section">
+        <h3>Weekly Availability</h3>
+        <div class="availability-grid">
+            <div class="availability-group">
+                <strong>Monday</strong>
+                <label><input type="checkbox" name="availability[Monday][]" value="Morning"> Morning</label>
+                <label><input type="checkbox" name="availability[Monday][]" value="Afternoon"> Afternoon</label>
+                <label><input type="checkbox" name="availability[Monday][]" value="Evening"> Evening</label>
+            </div>
+            <div class="availability-group">
+                <strong>Tuesday</strong>
+                <label><input type="checkbox" name="availability[Tuesday][]" value="Morning"> Morning</label>
+                <label><input type="checkbox" name="availability[Tuesday][]" value="Afternoon"> Afternoon</label>
+                <label><input type="checkbox" name="availability[Tuesday][]" value="Evening"> Evening</label>
+            </div>
+            <div class="availability-group">
+                <strong>Wednesday</strong>
+                <label><input type="checkbox" name="availability[Wednesday][]" value="Morning"> Morning</label>
+                <label><input type="checkbox" name="availability[Wednesday][]" value="Afternoon"> Afternoon</label>
+                <label><input type="checkbox" name="availability[Wednesday][]" value="Evening"> Evening</label>
+            </div>
+            <div class="availability-group">
+                <strong>Thursday</strong>
+                <label><input type="checkbox" name="availability[Thursday][]" value="Morning"> Morning</label>
+                <label><input type="checkbox" name="availability[Thursday][]" value="Afternoon"> Afternoon</label>
+                <label><input type="checkbox" name="availability[Thursday][]" value="Evening"> Evening</label>
+            </div>
+            <div class="availability-group">
+                <strong>Friday</strong>
+                <label><input type="checkbox" name="availability[Friday][]" value="Morning"> Morning</label>
+                <label><input type="checkbox" name="availability[Friday][]" value="Afternoon"> Afternoon</label>
+                <label><input type="checkbox" name="availability[Friday][]" value="Evening"> Evening</label>
+            </div>
+            <div class="availability-group">
+                <strong>Saturday</strong>
+                <label><input type="checkbox" name="availability[Saturday][]" value="Morning"> Morning</label>
+                <label><input type="checkbox" name="availability[Saturday][]" value="Afternoon"> Afternoon</label>
+                <label><input type="checkbox" name="availability[Saturday][]" value="Evening"> Evening</label>
+            </div>
+            <div class="availability-group">
+                <strong>Sunday</strong>
+                <label><input type="checkbox" name="availability[Sunday][]" value="Morning"> Morning</label>
+                <label><input type="checkbox" name="availability[Sunday][]" value="Afternoon"> Afternoon</label>
+                <label><input type="checkbox" name="availability[Sunday][]" value="Evening"> Evening</label>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit">Submit</button>
+</form>
+</body>
+</html>
