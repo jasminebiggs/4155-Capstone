@@ -1,11 +1,11 @@
 # test/test_rating.py
-# completed on June 22
+# Additional test for Ticket 5
 
 import pytest
 from httpx import AsyncClient
 from main import app
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_submit_rating():
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.post("/rate", json={
