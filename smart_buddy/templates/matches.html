@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Buddy Matches - Smart Buddy</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    <style>
+        .matches-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .match-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-left: 5px solid #4CAF50;
+        }
+        
+        .match-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .match-username {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .compatibility-score {
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 20px;
+            color: white;
+        }
+        
+        .score-excellent { background-color: #4CAF50; }
+        .score-good { background-color: #8BC34A; }
+        .score-average { background-color: #FF9800; }
+        .score-poor { background-color: #f44336; }
+        
+        .compatibility-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .breakdown-item {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .breakdown-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .breakdown-score {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .shared-times {
+            margin-top: 15px;
+        }
+        
+        .time-slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .time-slot {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            border: 1px solid #bbdefb;
+        }
+        
+        .search-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .controls-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .control-group label {
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .control-group input, .control-group select {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .find-matches-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .find-matches-btn:hover {
+            background-color: #45a049;
+        }
+        
+        .no-matches {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.1em;
+            color: #666;
+        }
+        
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #f44336;
+            margin: 20px 0;
+        }
+        
+        .success-message {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+            margin: 20px 0;
+        }
+
+        .scheduling-info {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .scheduling-title {
+            font-weight: bold;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="matches-container">
+        <h1>Find Your Study Buddies</h1>
+        
+        <div class="search-controls">
+            <div class="controls-row">
+                <div class="control-group">
+                    <label for="student-select">Select Student:</label>
+                    <select id="student-select">
+                        <option value="">Choose a student...</option>
+                        {% for profile in profiles %}
+                        <option value="{{ profile.id }}" 
+                                {% if current_student_id == profile.id %}selected{% endif %}>
+                            {{ profile.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="min-score">Minimum Score:</label>
+                    <input type="number" id="min-score" min="0" max="100" value="50" step="5">
+                </div>
+                
+                <div class="control-group">
+                    <label for="max-results">Max Results:</label>
+                    <input type="number" id="max-results" min="1" max="20" value="10">
+                </div>
+                
+                <div class="control-group">
+                    <button class="find-matches-btn" onclick="findMatches()">Find Matches</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="results-container">
+            {% if error_message %}
+            <div class="error-message">{{ error_message }}</div>
+            {% elif success_message %}
+            <div class="success-message">{{ success_message }}</div>
+            {% endif %}
+
+            <div id="matches-list">
+                {% if matches %}
+                    {% for match in matches %}
+                    <div class="match-card">
+                        <div class="match-header">
+                            <div class="match-username">{{ match.partner_username }}</div>
+                            <div class="compatibility-score {{ 'score-excellent' if match.total_score >= 80 else 'score-good' if match.total_score >= 70 else 'score-average' if match.total_score >= 60 else 'score-poor' }}">
+                                {{ "%.1f"|format(match.total_score) }}%
+                            </div>
+                        </div>
+                        
+                        <div class="compatibility-breakdown">
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">Personality</div>
+                                <div class="breakdown-score">{{ "%.1f"|format(match.personality_score) }}%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">Study Style</div>
+                                <div class="breakdown-score">{{ "%.1f"|format(match.study_preferences_score) }}%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">Academic Goals</div>
+                                <div class="breakdown-score">{{ "%.1f"|format(match.academic_goals_score) }}%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">Availability</div>
+                                <div class="breakdown-score">{{ "%.1f"|format(match.availability_score) }}%</div>
+                            </div>
+                        </div>
+                        
+                        {% if match.shared_time_slots %}
+                        <div class="shared-times">
+                            <strong>Shared Available Times:</strong>
+                            <div class="time-slots">
+                                {% for day, time in match.shared_time_slots %}
+                                <span class="time-slot">{{ day }} {{ time }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    
+                    {% if scheduling_analysis %}
+                    <div class="scheduling-info">
+                        <div class="scheduling-title">Scheduling Analysis</div>
+                        <p><strong>Total possible sessions:</strong> {{ scheduling_analysis.total_sessions_possible }}</p>
+                        <p><strong>Partners with feasible sessions:</strong> {{ scheduling_analysis.partners_with_sessions }}</p>
+                        <p><strong>Schedule feasible:</strong> {{ "Yes" if scheduling_analysis.scheduling_feasible else "No" }}</p>
+                        {% if scheduling_analysis.constraint_violations %}
+                        <p><strong>Constraints:</strong></p>
+                        <ul>
+                            {% for violation in scheduling_analysis.constraint_violations %}
+                            <li>{{ violation }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="no-matches">
+                        {% if current_student_id %}
+                        No compatible study buddies found. Try lowering the minimum score or check back later as more students join!
+                        {% else %}
+                        Select a student to find their compatible study buddies.
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function findMatches() {
+            const studentId = document.getElementById('student-select').value;
+            const minScore = document.getElementById('min-score').value;
+            const maxResults = document.getElementById('max-results').value;
+            
+            if (!studentId) {
+                alert('Please select a student first');
+                return;
+            }
+            
+            // Show loading state
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = '<div class="loading">Finding matches...</div>';
+            
+            try {
+                const response = await fetch(`/matching/find-matches/${studentId}?min_score=${minScore}&max_results=${maxResults}&include_scheduling=true`);
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Failed to find matches');
+                }
+                
+                displayMatches(data);
+                
+            } catch (error) {
+                resultsContainer.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
+            }
+        }
+        
+        function displayMatches(data) {
+            const resultsContainer = document.getElementById('results-container');
+            
+            if (!data.matches || data.matches.length === 0) {
+                resultsContainer.innerHTML = '<div class="no-matches">No compatible study buddies found. Try lowering the minimum score!</div>';
+                return;
+            }
+            
+            let html = '<div id="matches-list">';
+            
+            data.matches.forEach(match => {
+                const scoreClass = match.total_score >= 80 ? 'score-excellent' : 
+                                match.total_score >= 70 ? 'score-good' : 
+                                match.total_score >= 60 ? 'score-average' : 'score-poor';
+                
+                html += `
+                    <div class="match-card">
+                        <div class="match-header">
+                            <div class="match-username">${match.partner_username}</div>
+                            <div class="compatibility-score ${scoreClass}">
+                                ${match.total_score.toFixed(1)}%
+                            </div>
+                        </div>
+                        
+                        <div class="compatibility-breakdown">
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">Personality</div>
+                                <div class="breakdown-score">${match.personality_score.toFixed(1)}%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">Study Style</div>
+                                <div class="breakdown-score">${match.study_preferences_score.toFixed(1)}%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">Academic Goals</div>
+                                <div class="breakdown-score">${match.academic_goals_score.toFixed(1)}%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">Availability</div>
+                                <div class="breakdown-score">${match.availability_score.toFixed(1)}%</div>
+                            </div>
+                        </div>`;
+                
+                if (match.shared_time_slots && match.shared_time_slots.length > 0) {
+                    html += `
+                        <div class="shared-times">
+                            <strong>Shared Available Times:</strong>
+                            <div class="time-slots">`;
+                    
+                    match.shared_time_slots.forEach(slot => {
+                        html += `<span class="time-slot">${slot[0]} ${slot[1]}</span>`;
+                    });
+                    
+                    html += `</div></div>`;
+                }
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            
+            // Add scheduling analysis if available
+            if (data.scheduling_analysis) {
+                const analysis = data.scheduling_analysis;
+                html += `
+                    <div class="scheduling-info">
+                        <div class="scheduling-title">Scheduling Analysis</div>
+                        <p><strong>Total possible sessions:</strong> ${analysis.total_sessions_possible}</p>
+                        <p><strong>Partners with feasible sessions:</strong> ${analysis.partners_with_sessions}</p>
+                        <p><strong>Schedule feasible:</strong> ${analysis.scheduling_feasible ? 'Yes' : 'No'}</p>`;
+                
+                if (analysis.constraint_violations && analysis.constraint_violations.length > 0) {
+                    html += '<p><strong>Constraints:</strong></p><ul>';
+                    analysis.constraint_violations.forEach(violation => {
+                        html += `<li>${violation}</li>`;
+                    });
+                    html += '</ul>';
+                }
+                
+                html += '</div>';
+            }
+            
+            resultsContainer.innerHTML = html;
+        }
+        
+        // Auto-load matches if a student is pre-selected
+        window.addEventListener('load', function() {
+            const studentSelect = document.getElementById('student-select');
+            if (studentSelect.value) {
+                findMatches();
+            }
+        });
+    </script>
+</body>
+</html>

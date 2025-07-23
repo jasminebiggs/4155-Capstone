@@ -1,7 +1,15 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pytest
 pytest-mock
+pytest-asyncio
+pytest-cov
 httpx
 mysql-connector-python
 mysql
+sqlalchemy
+pydantic
+python-jose[cryptography]
+python-multipart
+jinja2
+starlette

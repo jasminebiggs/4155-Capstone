@@ -1,6 +1,6 @@
 
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 class ProfileCreate(BaseModel):
     username: str
@@ -19,3 +19,6 @@ class RatingCreate(BaseModel):
     reviewee: str
     score: int
     feedback: Optional[str] = None
+
+class Availability(BaseModel):
+    availability: Dict[str, List[str]]
