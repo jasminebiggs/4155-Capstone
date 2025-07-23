@@ -16,7 +16,7 @@ class AvailabilityUpdate(BaseModel):
     user_id: int
     availability: dict
 
-@router.get("/home", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse)
 def read_home(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
