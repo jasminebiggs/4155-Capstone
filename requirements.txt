@@ -4,6 +4,7 @@ pytest
 pytest-mock
 pytest-asyncio
 pytest-cov
+pymysql
 httpx
 mysql-connector-python
 mysql
