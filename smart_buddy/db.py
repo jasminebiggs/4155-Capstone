@@ -6,13 +6,31 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-user = os.getenv("DB_USER")
-password = os.getenv("DB_PASSWORD")
-host = os.getenv("DB_HOST")
-port = os.getenv("DB_PORT", "3306")
-db   = os.getenv("DB_NAME")
+# Render and other platforms often provide a single DATABASE_URL.
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASE_URL = f"mysql+pymysql://{user}:{password}@{host}:{port}/{db}"
+# Fallback to individual components if DATABASE_URL is not set (for local development).
+if not DATABASE_URL:
+    user = os.getenv("DB_USER")
+    password = os.getenv("DB_PASSWORD")
+    host = os.getenv("DB_HOST")
+    port = os.getenv("DB_PORT", "5432") # Default PostgreSQL port
+    db_name = os.getenv("DB_NAME")
+
+    # Check that all required environment variables are set.
+    if not all([user, password, host, db_name]):
+        raise ValueError(
+            "Database connection failed. For local development, please set all of "
+            "DB_USER, DB_PASSWORD, DB_HOST, and DB_NAME environment variables."
+        )
+
+    DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{db_name}"
+
+# SQLAlchemy 1.x and 2.x have different behaviors with postgresql:// URLs.
+# Replacing "postgresql://" with "postgresql+psycopg2://" is a safe way
+# to ensure compatibility.
+if DATABASE_URL and DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg2://", 1)
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -20,11 +38,11 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 def get_db():
-    db = SessionLocal()
+    db_session = SessionLocal()
     try:
-        yield db
+        yield db_session
     finally:
-        db.close()
+        db_session.close()
 
 # Create tables if they don't exist
 def create_tables():

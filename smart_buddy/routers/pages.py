@@ -63,37 +63,43 @@ async def create_profile(
         db.close()
 @router.get("/schedule", response_class=HTMLResponse)
 def read_schedule(request: Request, user_id: int = None, db: Session = Depends(get_db)):
-    # Get all profiles for the dropdown
-    all_profiles = db.query(Profile).all()
-    
-    # Determine which user to display
-    user_to_display = None
-    if user_id:
-        user_to_display = db.query(Profile).filter(Profile.id == user_id).first()
-    elif all_profiles:
-        # If no user_id is specified, default to the first user
-        user_to_display = all_profiles[0]
+    try:
+        # Get all profiles for the dropdown
+        all_profiles = db.query(Profile).all()
+        
+        # Determine which user to display
+        user_to_display = None
+        if user_id:
+            user_to_display = db.query(Profile).filter(Profile.id == user_id).first()
+        elif all_profiles:
+            # If no user_id is specified, default to the first user
+            user_to_display = all_profiles[0]
 
-    current_user_id = None
-    availability = {}
-    
-    if user_to_display:
-        current_user_id = user_to_display.id
-        # Ensure availability is a dict, not a string
-        if isinstance(user_to_display.availability, str):
-            try:
-                availability = json.loads(user_to_display.availability)
-            except json.JSONDecodeError:
-                availability = {} # or handle error appropriately
-        else:
-            availability = user_to_display.availability if user_to_display.availability else {}
-    
-    return templates.TemplateResponse("schedule.html", {
-        "request": request, 
-        "all_profiles": all_profiles,
-        "current_user_id": current_user_id,
-        "availability": availability
-    })
+        current_user_id = None
+        availability = {}
+        
+        if user_to_display:
+            current_user_id = user_to_display.id
+            # Ensure availability is a dict, not a string
+            if isinstance(user_to_display.availability, str):
+                try:
+                    availability = json.loads(user_to_display.availability)
+                except json.JSONDecodeError:
+                    availability = {} # or handle error appropriately
+            else:
+                availability = user_to_display.availability if user_to_display.availability else {}
+        
+        return templates.TemplateResponse("schedule.html", {
+            "request": request, 
+            "all_profiles": all_profiles,
+            "current_user_id": current_user_id,
+            "availability": availability
+        })
+    except Exception as e:
+        # Log the error for debugging
+        print(f"An error occurred in /schedule: {e}")
+        # Return a user-friendly error page
+        return HTMLResponse(content="<h1>Error</h1><p>Could not load schedule data. The database might be empty or unavailable.</p>", status_code=500)
 
 @router.get("/matched-users", response_class=HTMLResponse)
 def read_matched_users(request: Request):
