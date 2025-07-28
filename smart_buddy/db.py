@@ -7,7 +7,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Render and other platforms often provide a single DATABASE_URL.
-DATABASE_URL = os.getenv("DATABASE_URL")
+DATABASE_URL = os.getenv("DATABASE_URL") 
+print(f"Initial DATABASE_URL: {DATABASE_URL}")
+
+# Handle postgres:// URL format (Render uses this)
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+    print(f"Converted postgres:// to postgresql:// URL: {DATABASE_URL}")
+
 
 # Fallback to individual components if DATABASE_URL is not set (for local development).
 if not DATABASE_URL:
@@ -44,11 +51,10 @@ def get_db():
     finally:
         db_session.close()
 
-# Create tables if they don't exist
+# Create tables if they don't exist 
 def create_tables():
     from smart_buddy.models.sqlalchemy_models import Profile, Session, Rating
     Base.metadata.create_all(bind=engine)
 
 # Initialize database on import
-# create_tables() # It is not recommended to run create_tables() on every import. 
-# Consider using a migration tool like Alembic to manage your database schema.
+create_tables()
