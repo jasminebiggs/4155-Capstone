@@ -8,8 +8,8 @@ import sys
 import os
 
 def run_availability_tests():
-    """Run all availability-related tests"""
-    print("🚀 Running Availability Test Suite")
+    """Run all availability tests"""
+    print("Running Availability Test Suite")
     print("=" * 50)
     
     # Change to project directory
@@ -37,8 +37,8 @@ def run_availability_tests():
     total_tests_failed = 0
     
     for test_suite in test_commands:
-        print(f"\n📋 {test_suite['name']}")
-        print(f"⏱️  Estimated time: {test_suite['time_estimate']}")
+        print(f"\n[TEST] {test_suite['name']}")
+        print(f"[TIME] Estimated time: {test_suite['time_estimate']}")
         print("-" * 40)
         
         try:
@@ -54,38 +54,38 @@ def run_availability_tests():
                 print("STDERR:", result.stderr)
             
             if result.returncode == 0:
-                print("✅ Test suite passed!")
+                print("[PASS] Test suite passed!")
                 # Count passed tests (rough estimate)
                 passed_count = result.stdout.count(" PASSED")
                 total_tests_passed += passed_count
             else:
-                print("❌ Test suite failed!")
+                print("[FAIL] Test suite failed!")
                 failed_count = result.stdout.count(" FAILED")
                 total_tests_failed += failed_count
                 
         except subprocess.TimeoutExpired:
-            print("⏰ Test suite timed out!")
+            print("[TIMEOUT] Test suite timed out!")
             total_tests_failed += 1
         except Exception as e:
-            print(f"💥 Error running test suite: {e}")
+            print(f"[ERROR] Error running test suite: {e}")
             total_tests_failed += 1
     
     print("\n" + "=" * 50)
-    print("📊 AVAILABILITY TEST SUMMARY")
+    print("AVAILABILITY TEST SUMMARY")
     print("=" * 50)
-    print(f"✅ Tests Passed: {total_tests_passed}")
-    print(f"❌ Tests Failed: {total_tests_failed}")
+    print(f"[PASS] Tests Passed: {total_tests_passed}")
+    print(f"[FAIL] Tests Failed: {total_tests_failed}")
     
     if total_tests_failed == 0:
-        print("🎉 All availability tests passed!")
+        print("SUCCESS: All availability tests passed!")
         return 0
     else:
-        print("⚠️  Some tests failed. Please review the output above.")
+        print("WARNING: Some tests failed. Please review the output above.")
         return 1
 
 def run_coverage_report():
     """Run tests with coverage reporting"""
-    print("\n📈 Generating Coverage Report")
+    print("\n[COVERAGE] Generating Coverage Report")
     print("-" * 30)
     
     coverage_command = [
@@ -105,12 +105,12 @@ def run_coverage_report():
             print("STDERR:", result.stderr)
         
         if result.returncode == 0:
-            print("📋 Coverage report generated in htmlcov/index.html")
+            print("[SUCCESS] Coverage report generated in htmlcov/index.html")
         else:
-            print("❌ Coverage report generation failed")
+            print("[FAIL] Coverage report generation failed")
             
     except Exception as e:
-        print(f"💥 Error generating coverage report: {e}")
+        print(f"[ERROR] Error generating coverage report: {e}")
 
 def run_specific_test(test_file=None):
     """Run a specific test file"""
@@ -137,17 +137,17 @@ def run_specific_test(test_file=None):
     test_path = f"smart_buddy/tests/{test_file}"
     
     if not os.path.exists(test_path):
-        print(f"❌ Test file not found: {test_path}")
+        print(f"[ERROR] Test file not found: {test_path}")
         return 1
     
-    print(f"🏃‍♂️ Running {test_file}")
+    print(f"[RUNNING] Running {test_file}")
     command = ["python", "-m", "pytest", test_path, "-v", "--tb=long"]
     
     try:
         result = subprocess.run(command)
         return result.returncode
     except Exception as e:
-        print(f"💥 Error running test: {e}")
+        print(f"[ERROR] Error running test: {e}")
         return 1
 
 if __name__ == "__main__":
