@@ -1,0 +1,48 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>Ratings</title>
+</head>
+<body>
+    
+<header>
+    <nav>
+        <a href="/home">Home</a>
+        <a href="/login">Login</a>
+        <a href="/profile">Create Profile</a>
+        <a href="/schedule">Calendar/Schedule</a>
+        <a href="/matched-users">Matched Users</a>
+        <a href="/ratings">Ratings</a>
+    </nav>
+</header>
+<style>
+    header {
+        background-color: #046A38;
+        padding: 1rem;
+    }
+    nav a {
+        color: white;
+        text-decoration: none;
+        margin-right: 20px;
+        font-weight: bold;
+    }
+    nav a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+    <main>
+        <h1>Rate Your Session</h1>
+        <form action="/ratings" method="post">
+            <label>Session ID:</label><input type="number" name="session_id"><br>
+            <label>User ID:</label><input type="number" name="user_id"><br>
+            <label>Score (0-5):</label><input type="number" step="0.1" min="0" max="5" name="score"><br>
+            <label>Feedback:</label><textarea name="feedback"></textarea><br>
+            <input type="submit" value="Submit Rating">
+        </form>
+    </main>
+</body>
+</html>
