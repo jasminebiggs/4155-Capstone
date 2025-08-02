@@ -19,7 +19,7 @@ class RatingInput(BaseModel):
     reviewer_id: int
     partner_id: int
     rating: conint(ge=1, le=5)
-    feedback: str | None = None
+    feedback: Optional[str] = None
 
 @router.post("/rate")
 def rate_partner(data: RatingInput, db: Session = Depends(get_db)):
