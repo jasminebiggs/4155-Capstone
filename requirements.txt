@@ -5,11 +5,13 @@ pytest-mock
 pytest-asyncio
 pytest-cov
 httpx
-sqlalchemy
 pydantic
+sqla
 python-jose[cryptography]
 python-multipart
 jinja2
 starlette
 psycopg2-binary
 python-dotenv
+mysql-connector-python
+mysql
