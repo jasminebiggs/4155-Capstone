@@ -6,7 +6,8 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
-from smart_buddy.models.sqlalchemy_models import Profile, Base
+# Fix import path to use the same models as the main application
+from smart_buddy.models import Profile, Base
 from smart_buddy.schemas import Availability
 import json
 

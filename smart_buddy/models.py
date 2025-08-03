@@ -12,10 +12,11 @@ class User(Base):
     password = Column(String(100))
     created_at = Column(DateTime, default=func.now())
 
-# Add Profile class required by the application
 class Profile(Base):
+    # Add extend_existing=True to handle duplicate table definitions
     __tablename__ = 'profiles'
-
+    __table_args__ = {'extend_existing': True}
+    
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String(100), nullable=False)
     username = Column(String(50), unique=True, index=True)
@@ -26,19 +27,19 @@ class Profile(Base):
     password = Column(String(100), nullable=False)
     availability = Column(JSON)
 
-# Add Session class required by the application
 class Session(Base):
     __tablename__ = 'sessions'
-
+    __table_args__ = {'extend_existing': True}
+    
     id = Column(Integer, primary_key=True, index=True)
     student1 = Column(String(50), nullable=False)
     student2 = Column(String(50), nullable=False)
     datetime = Column(DateTime, nullable=False)
 
-# Add Rating class required by the application
 class Rating(Base):
     __tablename__ = 'ratings'
-
+    __table_args__ = {'extend_existing': True}
+    
     id = Column(Integer, primary_key=True, index=True)
     reviewer = Column(String(50), nullable=False)
     reviewee = Column(String(50), nullable=False)
