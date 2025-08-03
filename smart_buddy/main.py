@@ -1,14 +1,26 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+from sqlalchemy.orm import Session
 
-app = FastAPI()
+import models
+from db import engine, get_db
+
+# Create database tables
+models.Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title="Smart Buddy API")
 
 app.add_middleware(SessionMiddleware, secret_key="SUPER_SECRET_KEY")
 app.mount('/static', StaticFiles(directory='smart_buddy/static'), name='static')
 templates = Jinja2Templates(directory="smart_buddy/templates")
+
+# Add a root endpoint to redirect to home
+@app.get("/")
+def redirect_to_home():
+    return RedirectResponse(url="/home", status_code=303)
 
 # --- LOGIN & PROFILE CREATION ---
 
@@ -142,3 +154,12 @@ async def submit_rating(
         "rating_success.html",  # <- new template!
         {"request": request, "username": request.session.get("username")}
     )
+
+@app.get("/health")
+def health_check(db: Session = Depends(get_db)):
+    try:
+        # Try to execute a simple query
+        db.execute("SELECT 1")
+        return {"status": "healthy"}
+    except Exception as e:
+        return {"status": "unhealthy", "error": str(e)}
