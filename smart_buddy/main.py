@@ -2,47 +2,35 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
-from sqlalchemy.exc import IntegrityError
+from starlette.middleware.sessions import SessionMiddleware
 
-# --- Local Imports & Database ---
-# Combining imports from both branches to include all modules
-from . import db
-from .models.sqlalchemy_models import Profile
-from .routers import index, pages, interaction, rating, availability, user_profile
-
-# --- FastAPI App Initialization ---
 app = FastAPI()
 
-# Mount static files directory once
+app.add_middleware(SessionMiddleware, secret_key="SUPER_SECRET_KEY")
 app.mount('/static', StaticFiles(directory='smart_buddy/static'), name='static')
-
-# Initialize Jinja2 templates
 templates = Jinja2Templates(directory="smart_buddy/templates")
 
-# --- Include Routers ---
-# Including all routers from both branches to merge functionalities
-app.include_router(index.router)
-app.include_router(pages.router)
-app.include_router(interaction.router)
-app.include_router(rating.router)
-app.include_router(availability.router)
-app.include_router(user_profile.router) # From the 'main' branch
+# --- LOGIN & PROFILE CREATION ---
 
-# --- Root Endpoint ---
-# Kept from the 'main' branch as a simple welcome/health-check message
-@app.get("/")
-def read_root():
-    return {"message": "SMART BUDDY environment setup successful!"}
+@app.get("/login", response_class=HTMLResponse)
+async def login_get(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request, "message": ""})
 
-# --- Profile Creation Endpoints ---
-# Using the more complete implementation from the 'new-jasmine-sprint2' branch
+@app.post("/login", response_class=HTMLResponse)
+async def login_post(request: Request, username: str = Form(...), password: str = Form(...)):
+    # For demo, any username/password is accepted
+    request.session["username"] = username
+    return RedirectResponse(url="/home", status_code=303)
+
+@app.get("/logout", response_class=HTMLResponse)
+async def logout(request: Request):
+    request.session.clear()
+    return RedirectResponse(url="/login", status_code=303)
 
 @app.get("/profile", response_class=HTMLResponse)
 async def get_profile(request: Request):
-    """
-    Handles GET requests to the profile page, rendering the profile form.
-    """
-    return templates.TemplateResponse("profile.html", {"request": request})
+    username = request.session.get("username")
+    return templates.TemplateResponse("profile.html", {"request": request, "username": username})
 
 @app.post("/profile", response_class=HTMLResponse)
 async def post_profile(
@@ -53,73 +41,104 @@ async def post_profile(
     preferred_environment: str = Form(...),
     personality_traits: str = Form(...),
     academic_focus_areas: str = Form(...),
-    password: str = Form(...)
+    password: str = Form(...),
+    availability: str = Form(...)
 ):
-    """
-    Handles POST requests from the profile creation form.
-    It validates the data, checks for existing users, and creates a new profile.
-    """
-    form_data = await request.form()
-    availability_data = {}
-    
-    # Process availability checkboxes from the form
-    for key, value in form_data.items():
-        if key.startswith('availability[') and key.endswith('][]'):
-            day = key.split('[')[1].split(']')[0]
-            if day not in availability_data:
-                availability_data[day] = []
-            # Form data can send a single value or a list of values for checkboxes
-            if isinstance(value, list):
-                availability_data[day].extend(value)
-            else:
-                availability_data[day].append(value)
+    # In a real app, save to DB. For demo, just set session.
+    request.session["username"] = username
+    return templates.TemplateResponse("success.html", {"request": request, "username": username})
 
-    db_session = db.SessionLocal()
-    try:
-        # Check if username already exists
-        existing_username = db_session.query(Profile).filter(Profile.username == username).first()
-        if existing_username:
-            return templates.TemplateResponse("profile.html", {
-                "request": request, 
-                "error_message": f"Username '{username}' is already taken. Please choose another."
-            })
-        
-        # Check if email already exists
-        existing_email = db_session.query(Profile).filter(Profile.email == email).first()
-        if existing_email:
-            return templates.TemplateResponse("profile.html", {
-                "request": request, 
-                "error_message": f"Email '{email}' is already registered. Please use another."
-            })
-        
-        # Create new profile object
-        new_profile = Profile(
-            email=email,
-            username=username,
-            password=password, # Note: In a real app, hash the password!
-            personality_traits=personality_traits,
-            study_style=study_style,
-            preferred_environment=preferred_environment,
-            academic_focus_areas=academic_focus_areas,
-            availability=availability_data
-        )
-        db_session.add(new_profile)
-        db_session.commit()
-        
-        return templates.TemplateResponse("profile.html", {"request": request, "success_message": "Profile created successfully!"})
+# --- HOME ---
 
-    except IntegrityError:
-        db_session.rollback()
-        # This is a fallback for race conditions where the initial check passes but the commit fails
-        return templates.TemplateResponse("profile.html", {
-            "request": request, 
-            "error_message": "A profile with this username or email already exists."
-        })
-    except Exception as e:
-        db_session.rollback()
-        return templates.TemplateResponse("profile.html", {
-            "request": request, 
-            "error_message": f"An unexpected error occurred: {str(e)}"
-        })
-    finally:
-        db_session.close()
+@app.get("/home", response_class=HTMLResponse)
+async def home(request: Request):
+    username = request.session.get("username")
+    return templates.TemplateResponse("home.html", {"request": request, "username": username})
+
+# --- NOT AUTHORIZED PAGE ---
+@app.get("/not-authorized", response_class=HTMLResponse)
+async def not_authorized(request: Request):
+    username = request.session.get("username")
+    return templates.TemplateResponse("not_authorized.html", {"request": request, "username": username})
+
+
+@app.get("/matched-users", response_class=HTMLResponse)
+async def matched_users(request: Request):
+    username = request.session.get("username")
+    if not username:
+        return RedirectResponse("/login", status_code=303)
+    matched_profiles = [
+        {
+            "username": "biggsjasmine05",
+            "study_style": "Visual",
+            "environment": "Library",
+            "profile_pic": "662972b3-bddd-4c76-9ad9-d2faa98670f2.png",
+            "matched_on": "Calculus II",
+            "next_session": "Monday, 2:00 PM"
+        },
+        {
+            "username": "johnstudent1",
+            "study_style": "Auditory",
+            "environment": "Cafe",
+            "profile_pic": "04d418f1-b15a-456b-ac89-00c79661fc91.png",
+            "matched_on": "Cybersecurity",
+            "next_session": "Wednesday, 11:00 AM"
+        },
+    ]
+    return templates.TemplateResponse(
+        "matched_users.html",
+        {"request": request, "username": username, "matched_profiles": matched_profiles}
+    )
+
+@app.get("/schedule", response_class=HTMLResponse)
+async def schedule(request: Request):
+    username = request.session.get("username")
+    if not username:
+        return RedirectResponse("/login", status_code=303)
+    sessions = [
+        {"day": "Monday", "time": "2:00 PM", "subject": "Calculus II"},
+        {"day": "Wednesday", "time": "11:00 AM", "subject": "Cybersecurity"},
+        {"day": "Friday", "time": "9:30 AM", "subject": "Data Structures"},
+    ]
+    return templates.TemplateResponse(
+        "schedule.html",
+        {"request": request, "username": username, "sessions": sessions}
+    )
+
+
+# --- RATINGS (PROTECTED) ---
+
+@app.get("/ratings", response_class=HTMLResponse)
+async def ratings(request: Request):
+    username = request.session.get("username")
+    if not username:
+        return RedirectResponse("/login", status_code=303)
+    if username != "jbiggs7":
+        return RedirectResponse("/not-authorized", status_code=303)
+    ratings = [
+        {"session": "Calculus II", "partner": "biggsjasmine05", "score": 5, "feedback": "Great session!"},
+        {"session": "Cybersecurity", "partner": "johnstudent1", "score": 4, "feedback": "Very helpful."},
+    ]
+    return templates.TemplateResponse(
+        "ratings.html",
+        {
+            "request": request,
+            "username": username,
+            "ratings": ratings
+        }
+    )
+
+@app.post("/ratings", response_class=HTMLResponse)
+async def submit_rating(
+    request: Request,
+    session_id: int = Form(...),
+    reviewer_id: int = Form(...),
+    partner_id: int = Form(...),
+    rating: int = Form(...),
+    feedback: str = Form(...)
+):
+    # Save to DB logic goes here if needed
+    return templates.TemplateResponse(
+        "rating_success.html",  # <- new template!
+        {"request": request, "username": request.session.get("username")}
+    )

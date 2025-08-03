@@ -1,13 +1,16 @@
 
 from pydantic import BaseModel
-from typing import List, Optional, Dict
+from typing import List, Optional
 
 class ProfileCreate(BaseModel):
     username: str
+    email: str
+    password: str
     study_style: str
     environment: str
     personality: str
     focus_areas: List[str]
+    availability: dict
 
 class SessionCreate(BaseModel):
     student1: str
@@ -19,6 +22,3 @@ class RatingCreate(BaseModel):
     reviewee: str
     score: int
     feedback: Optional[str] = None
-
-class Availability(BaseModel):
-    availability: Dict[str, List[str]]

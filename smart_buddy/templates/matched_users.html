@@ -1,13 +1,70 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <link rel="stylesheet" href="/static/style.css">
     <meta charset="UTF-8">
     <title>Matched Users</title>
+    <style>
+        body {}
+        header {
+            background-color: #046A38;
+            padding: 1rem;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        .matched-users-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 50px;
+        }
+        .user-card {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 6px 24px #046A3822;
+            width: 350px;
+            min-height: 190px;
+            display: flex;
+            align-items: center;
+            padding: 30px 24px;
+            transition: box-shadow 0.2s;
+            position: relative;
+        }
+        .user-card:hover {
+            box-shadow: 0 10px 32px #046A3866;
+        }
+        .profile-pic {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 25px;
+            border: 3px solid #046A38;
+            background: #f4f4f4;
+        }
+        .user-details {
+            flex: 1;
+        }
+        .user-details h2 {
+            margin: 0 0 6px 0;
+            color: #046A38;
+        }
+        .user-details p {
+            margin: 5px 0;
+            color: #232323;
+            font-size: 1.06em;
+        }
+    </style>
 </head>
 <body>
-    
 <header>
     <nav>
         <a href="/home">Home</a>
@@ -18,24 +75,35 @@
         <a href="/ratings">Ratings</a>
     </nav>
 </header>
-<style>
-    body, header {
-        background-color: #046A38;
-        padding: 1rem;
-    }
-    nav a {
-        color: white;
-        text-decoration: none;
-        margin-right: 20px;
-        font-weight: bold;
-    }
-    nav a:hover {
-        text-decoration: underline;
-    }
-</style>
 
-    <main>
-        <h1>Matched Users</h1>
-    </main>
+<main>
+    <div style="text-align:right; padding: 10px;">Signed in as: {{ username }}</div>
+    <h1 style="text-align:center; color:#046A38;">Matched Users</h1>
+    <div class="matched-users-container">
+        <!-- Jasmine Biggs -->
+        <div class="user-card">
+            <img src="/static/womanpfp.png" alt="Jasmine Biggs Profile Picture" class="profile-pic">
+            <div class="user-details">
+                <h2>biggsjasmine05</h2>
+                <p><b>Study Style:</b> Visual</p>
+                <p><b>Environment:</b> Library</p>
+                <p><b>Matched On:</b> Calculus II</p>
+                <p><b>Next Session:</b> Monday, 2:00 PM</p>
+            </div>
+        </div>
+        <!-- John Student -->
+        <div class="user-card">
+            <img src="/static/manpfp.png" alt="John Student Profile Picture" class="profile-pic">
+            <div class="user-details">
+                <h2>johnstudent1</h2>
+                <p><b>Study Style:</b> Auditory</p>
+                <p><b>Environment:</b> Cafe</p>
+                <p><b>Matched On:</b> Cybersecurity</p>
+                <p><b>Next Session:</b> Wednesday, 11:00 AM</p>
+            </div>
+        </div>
+    </div>
+</main>
 </body>
 </html>
+

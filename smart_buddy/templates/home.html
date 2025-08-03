@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,46 +5,105 @@
     <meta charset="UTF-8">
     <title>Home</title>
     <style>
-        body {
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
             font-family: Arial, sans-serif;
         }
+
         header {
             background-color: #046A38;
             padding: 1rem;
         }
+
         nav a {
             color: white;
             text-decoration: none;
             margin-right: 20px;
             font-weight: bold;
         }
+
         nav a:hover {
             text-decoration: underline;
         }
-        .welcome-section {
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 80px); /* full screen minus header */
             padding: 2rem;
-            max-width: 800px;
+            max-width: 1000px;
             margin: auto;
+            box-sizing: border-box;
+            text-align: center;
         }
-        .welcome-section h2 {
+
+        .welcome-section, .about-section {
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .about-section img {
+            margin-top: 20px;
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .welcome-section h1,
+        .about-section h2 {
             color: #046A38;
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="/home">Home</a>
-            <a href="/login">Login</a>
-            <a href="/profile">Create Profile</a>
-            <a href="/schedule">Calendar/Schedule</a>
-            <a href="/matched-users">Matched Users</a>
-            <a href="/ratings">Ratings</a>
-        </nav>
-    </header>
-    <main class="welcome-section">
-        <h1>Welcome to SmartBuddy</h1>
-        <p>SmartBuddy is a platform designed to help UNC Charlotte students find compatible study partners based on shared academic interests, study styles, and availability. Whether you prefer quiet solo sessions or collaborative group environments, SmartBuddy makes it easy to connect with others who match your study needs. Start by creating your profile and exploring matched users today.</p>
+<header>
+    <nav style="background-color: #046A38; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+    <a href="/home">Home</a>
+    <a href="/login">Login</a>
+    <a href="/profile">Create Profile</a>
+    <a href="/schedule">Calendar/Schedule</a>
+    <a href="/matched-users">Matched Users</a>
+    <a href="/ratings">Ratings</a>
+    </div>
+        {% if username %}
+            <div style="color: white; font-weight: bold;">
+                Logged in as: {{ username }}
+            </div>
+        {% endif %}
+    </nav>
+</header>
+
+    <main>
+        <div class="welcome-section">
+            <h1>Welcome to SmartBuddy</h1>
+            <p>
+                SmartBuddy is a platform designed to help UNC Charlotte students find compatible study partners
+                based on shared academic interests, study styles, and availability. Whether you prefer quiet solo sessions
+                or collaborative group environments, SmartBuddy makes it easy to connect with others who match your study needs.
+                Start by creating your profile and exploring matched users today.
+            </p>
+        </div>
+
+        <div class="about-section">
+            <h2>About Us</h2>
+            <p>
+                Smart Buddy is your personalized study partner matching system. Our goal is to help you connect with
+                other students who share your academic focus and preferred study style. Together, you can boost productivity,
+                stay accountable, and make studying more enjoyable!
+            </p>
+            <img src="/static/pexels-pixabay-159775.jpg" alt="Students studying in library">
+        </div>
     </main>
 </body>
 </html>

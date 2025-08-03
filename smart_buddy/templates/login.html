@@ -9,16 +9,37 @@
 <body>
     
 <header>
-    <nav>
-        <a href="/home">Home</a>
-        <a href="/login">Login</a>
-        <a href="/profile">Create Profile</a>
-        <a href="/schedule">Calendar/Schedule</a>
-        <a href="/matched-users">Matched Users</a>
-        <a href="/ratings">Ratings</a>
+    <nav style="background-color: #046A38; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <a href="/home">Home</a>
+            <a href="/login">Login</a>
+            <a href="/profile">Create Profile</a>
+            <a href="/schedule">Calendar/Schedule</a>
+            <a href="/matched-users">Matched Users</a>
+            <a href="/ratings">Ratings</a>
+        </div>
+        {% if username %}
+            <div style="color: white; font-weight: bold;">
+                Logged in as: {{ username }}
+            </div>
+        {% endif %}
     </nav>
 </header>
+
 <style>
+    nav a {
+        color: white;
+        text-decoration: none;
+        margin-right: 20px;
+        font-weight: bold;
+    }
+    nav a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<style>
+    body 
     header {
         background-color: #046A38;
         padding: 1rem;
@@ -43,7 +64,6 @@
             <input type="password" id="password" name="password"><br><br>
             <input type="submit" value="Submit">
         </form>
-        <p>For this demo, any username works as long as it exists in the DB. Password is always <strong>password</strong>.</p>
     </main>
 </body>
 </html>
