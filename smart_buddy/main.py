@@ -5,11 +5,12 @@ from starlette.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import Session
 
-import models
-from db import engine, get_db
+# Fix imports to use the correct module path
+from .sqlalchemy_models import Base
+from .db import engine, get_db
 
 # Create database tables
-models.Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Smart Buddy API")
 
