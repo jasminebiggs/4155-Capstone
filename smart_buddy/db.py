@@ -16,6 +16,9 @@ is_render = "RENDER" in os.environ
 # This will hold the final database connection URL
 DATABASE_URL = None
 
+# Default MySQL connection string
+DEFAULT_MYSQL_URL = "mysql+pymysql://root:Siraulo76!@localhost:3306/smart_buddy"
+
 # Check for a DATABASE_URL environment variable, common on hosting platforms
 if os.getenv("DATABASE_URL"):
     print("DATABASE_URL found, configuring for PostgreSQL (Render/Production).")
@@ -24,16 +27,21 @@ if os.getenv("DATABASE_URL"):
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 else:
-    # If no DATABASE_URL, configure for a local MySQL database
-    print("No DATABASE_URL found, configuring for local MySQL development.")
-    db_user = os.getenv("DB_USER", "root")
-    db_password = os.getenv("DB_PASSWORD", "password")
-    db_host = os.getenv("DB_HOST", "localhost")
-    db_port = os.getenv("DB_PORT", "3306")  # Default MySQL port
-    db_name = os.getenv("DB_NAME", "smart_buddy")
-    
-    # Construct the database URL for a local MySQL instance
-    DATABASE_URL = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+    # If environment variables are set, use them
+    if all([os.getenv("DB_USER"), os.getenv("DB_PASSWORD"), os.getenv("DB_HOST"), os.getenv("DB_NAME")]):
+        print("Database environment variables found, using them for MySQL connection.")
+        db_user = os.getenv("DB_USER")
+        db_password = os.getenv("DB_PASSWORD")
+        db_host = os.getenv("DB_HOST")
+        db_port = os.getenv("DB_PORT", "3306")  # Default MySQL port
+        db_name = os.getenv("DB_NAME")
+        
+        # Construct the database URL from environment variables
+        DATABASE_URL = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+    else:
+        # If no environment variables, use the default connection string
+        print("No database environment variables found, using default MySQL connection.")
+        DATABASE_URL = DEFAULT_MYSQL_URL
 
 # --- SQLAlchemy Engine Setup ---
 
