@@ -6,8 +6,8 @@ from starlette.middleware.sessions import SessionMiddleware
 from sqlalchemy.orm import Session
 
 # Fix imports to use the correct module path
-from .sqlalchemy_models import Base
 from .db import engine, get_db
+from .models import Base, User, Profile, Session as StudySession, Rating
 
 # Create database tables
 Base.metadata.create_all(bind=engine)

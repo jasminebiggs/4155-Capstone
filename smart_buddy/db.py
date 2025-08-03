@@ -10,26 +10,26 @@ load_dotenv()
 
 # --- Database Configuration ---
 
-# Detect if the application is running on Render
+# Detect if the application is running on a platform like Render
 is_render = "RENDER" in os.environ
 
 # This will hold the final database connection URL
 DATABASE_URL = None
 
-# Check for a DATABASE_URL environment variable (common on hosting platforms like Render)
+# Check for a DATABASE_URL environment variable, common on hosting platforms
 if os.getenv("DATABASE_URL"):
     print("DATABASE_URL found, configuring for PostgreSQL (Render/Production).")
     DATABASE_URL = os.getenv("DATABASE_URL")
-    # Some platforms use "postgres://" but SQLAlchemy needs "postgresql://"
+    # Heroku and other platforms use "postgres://", but SQLAlchemy needs "postgresql://"
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 else:
-    # For local development using MySQL
+    # If no DATABASE_URL, configure for a local MySQL database
     print("No DATABASE_URL found, configuring for local MySQL development.")
     db_user = os.getenv("DB_USER", "root")
-    db_password = os.getenv("DB_PASSWORD", "")
+    db_password = os.getenv("DB_PASSWORD", "password")
     db_host = os.getenv("DB_HOST", "localhost")
-    db_port = os.getenv("DB_PORT", "3306")
+    db_port = os.getenv("DB_PORT", "3306")  # Default MySQL port
     db_name = os.getenv("DB_NAME", "smart_buddy")
     
     # Construct the database URL for a local MySQL instance
@@ -38,39 +38,39 @@ else:
 # --- SQLAlchemy Engine Setup ---
 
 try:
-    # Create the SQLAlchemy engine
+    # Create the SQLAlchemy engine using the determined URL
     engine = create_engine(DATABASE_URL)
-    
+
     # Create a configured "Session" class
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    
+
     # Create a Base class for declarative models
     Base = declarative_base()
-    
-    # Test the database connection
+
+    # Test the database connection to ensure it's working
     with engine.connect() as connection:
         print("Database connection established successfully!")
 
 except Exception as e:
     print(f"ERROR: Database connection failed: {e}", file=sys.stderr)
     if is_render:
-        print("Hint: Ensure the DATABASE_URL environment variable is correctly set in your Render environment.", file=sys.stderr)
+        print("Hint: Ensure the DATABASE_URL environment variable is correctly set in your deployment environment.", file=sys.stderr)
     else:
-        print("Hint: Check that your local MySQL server is running and the environment variables are set correctly.", file=sys.stderr)
+        print("Hint: Check that your local MySQL server is running, PyMySQL is installed (`pip install pymysql`), and the .env file has the correct credentials.", file=sys.stderr)
     raise
+
+# --- Database Session Dependency ---
 
 def get_db():
     """
     Dependency function to get a database session for each request.
     Ensures the session is always closed after the request.
     """
-    db = SessionLocal()
+    db_session = SessionLocal()
     try:
-        yield db
+        yield db_session
     finally:
-        db.close()
-
-# --- Table Creation ---
+        db_session.close()
 def create_tables():
     """Create all database tables defined by models inheriting from Base."""
     try:
